@@ -64,6 +64,7 @@ const userSchema = new Schema(
                 ref: "Playlist"
             }
         ],
+        interestedIn: [],
         isVerified: {
             type: Boolean,
             default: false

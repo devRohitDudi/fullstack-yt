@@ -8,7 +8,8 @@ import {
     addViewAndHistory,
     uploadVideo,
     removeFromWatchHistory,
-    getWatchHistory
+    getWatchHistory,
+    homeVideos
 } from "../controllers/video.controller.js";
 
 import {
@@ -37,6 +38,8 @@ router.route("/upload").post(
 
 //verified
 router.route("/watch/:video_obj_id").get(verifyJWT, getVideo);
+
+router.route("/home").post(verifyJWT, homeVideos);
 
 //verified
 router

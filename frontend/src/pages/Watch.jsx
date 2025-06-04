@@ -6,6 +6,8 @@ import VideoSuggestions from "../components/VideoSuggestions";
 import useAuthStore from "../store/useAuthStore";
 import { Playlist } from "../../../backend/src/models/playlist.model";
 import VideoComments from "../components/VideoComments.jsx";
+import { usePreferencesStore } from "../store/useAuthStore.js";
+
 const Watch = () => {
   const { isLoggedIn, currentUsername } = useAuthStore();
   const [searchParams] = useSearchParams();
@@ -37,6 +39,9 @@ const Watch = () => {
   const [newPlaylistVisibility, setNewPlaylistVisibility] = useState("private");
   //TODO isLiked? && isDisliked?
   // for fetching video
+  const { interests, setUserInterests } = usePreferencesStore();
+  const handleSetInterests = async () => {};
+
   useEffect(() => {
     const fetchVideo = async () => {
       try {

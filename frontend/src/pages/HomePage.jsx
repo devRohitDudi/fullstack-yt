@@ -1,32 +1,79 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Sidebar from "../components/Sidebar.jsx";
-import VideoGrid from "../components/VideoGrid.jsx";
+// import VideoGrid from "../components/VideoGrid.jsx";
 import axios from "axios";
+import VideoCard from "../components/VideoCard.jsx";
+
 import useAuthStore from "../store/useAuthStore.js";
+import { usePreferencesStore } from "../store/useAuthStore.js";
 const HomePage = ({ sidebarOpen }) => {
   const [videos, setVideos] = useState([]);
+  //   const [page, setPage] = useState(1);
+  let page = 1;
+  const [fetchedVideosCount, setFetchedVideosCount] = useState(0);
+  const [isFetching, setIsFetching] = useState(false);
+  const isFetched = useRef(false);
+  const [error, setError] = useState();
+
+  const { interests, setUserInterests } = usePreferencesStore();
+  const handleSetInterests = async () => {};
+
+  const fetchSomeVideos = async () => {
+    if (isFetching || isFetched.current) return;
+
+    try {
+      setIsFetching(true);
+      const response = await axios.post(
+        `http://localhost:4000/api/v1/video/home?limit=10&page=${page}`,
+        {
+          localInterests: interests,
+        },
+        { withCredentials: "include", headers: {} }
+      );
+      const videosResponse = response.data.message.videos;
+      console.log(videosResponse);
+
+      if (response.status === 200) {
+        setVideos((prev) => [...prev, ...response.data.message.videos]);
+        page++;
+        console.log("Now page is:", page);
+
+        if (videosResponse.length === 0) {
+          isFetched.current = true;
+          console.log("setIsfetched:", isFetched.current);
+        }
+      }
+      console.log("now page is:", page);
+
+      setIsFetching(false);
+    } catch (error) {
+      setIsFetching(false);
+      setError(error);
+    }
+  };
 
   useEffect(() => {
-    setVideos([
-      {
-        id: "1",
-        title: "React Clone of YouTube",
-        thumbnailUrl:
-          "https://images.pexels.com/photos/28985912/pexels-photo-28985912/free-photo-of-rustic-wooden-cabin-in-lush-green-forest.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        channelName: "CodeWithRohit",
-        views: "340K",
-        time: "2 weeks ago",
-      },
-      {
-        id: "2",
-        title: "Tailwind CSS Full Tutorial",
-        thumbnailUrl:
-          "https://images.pexels.com/photos/30795200/pexels-photo-30795200/free-photo-of-red-barn-in-snowy-swedish-countryside.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-        channelName: "TailwindMaster",
-        views: "1.1M",
-        time: "1 month ago",
-      },
-    ]);
+    const handleScroll = () => {
+      if (isFetching || isFetched.current) return;
+
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 50
+      ) {
+        fetchSomeVideos();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Trigger fetch only once on first render
+    fetchSomeVideos();
   }, []);
 
   return (
@@ -35,7 +82,16 @@ const HomePage = ({ sidebarOpen }) => {
         <div className="flex-1">
           {sidebarOpen && <Sidebar sidebarOpen={sidebarOpen} />}
           <main className="flex-1 p-4">
-            <VideoGrid videos={videos} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {videos.map((video) => (
+                <VideoCard key={video._id} video={video} />
+              ))}
+            </div>
+            {isFetching ? (
+              <div className="flex justify-center items-center ">
+                <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            ) : null}
           </main>
         </div>
       </div>

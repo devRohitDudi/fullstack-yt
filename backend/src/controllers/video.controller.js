@@ -103,6 +103,75 @@ const uploadVideo = asyncHandler(async (req, res) => {
         );
 });
 
+const homeVideos = asyncHandler(async (req, res) => {
+    let interests = [];
+    const user = req.user;
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    if (user) {
+        const user = await User.findById(req.user._id).select("interestedIn");
+        if (user && user.interestedIn) {
+            interests = user.interestedIn;
+        }
+    } else if (req.body && req.body.localInterests) {
+        interests = req.body.localInterests;
+    }
+    let videos = null;
+    if (interests.length > 0) {
+        const interestPatterns = interests.map((term) => new RegExp(term, "i")); // created patterns for matching sentences
+
+        videos = await Video.find({
+            visibility: "public",
+            $or: [
+                {
+                    tags: { $in: { interests } }
+                },
+                ...interestPatterns.map((term) => ({ title: term })),
+                ...interestPatterns.map(
+                    (term) => (console.log(term), { description: term })
+                )
+            ]
+        })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .populate("owner", "avatar fullName username");
+
+        const videosWithWatchInfo = await Promise.all(
+            videos.map(async (video) => {
+                const isWatched = await History.exists({
+                    user: user._id,
+                    video: video._id
+                });
+                return { ...video, isWatched };
+            })
+        );
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    { videos: videosWithWatchInfo },
+                    "some videos recommanded to user"
+                )
+            );
+    } else {
+        videos = await Video.find({ visibility: "public" })
+            // .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .populate("owner", "avatar fullName username");
+        console.log({ skip, limit });
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, { videos }, "videos randomly found"));
+    }
+});
+
 const getVideo = asyncHandler(async (req, res) => {
     const { video_obj_id } = req.params;
     const video = await Video.findById(video_obj_id).select(
@@ -356,5 +425,6 @@ export {
     uploadVideo,
     addViewAndHistory,
     removeFromWatchHistory,
-    getWatchHistory
+    getWatchHistory,
+    homeVideos
 };

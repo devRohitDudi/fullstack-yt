@@ -17,6 +17,10 @@ const videoSchema = new Schema(
             min: 3,
             max: 100
         },
+        tags: {
+            type: [String],
+            default: []
+        },
         description: {
             type: String,
             min: 3,
@@ -58,10 +62,7 @@ const videoSchema = new Schema(
             enum: ["public", "private", "unlisted"],
             default: "public"
         },
-        tags: {
-            type: [String],
-            default: []
-        },
+
         comments: [
             {
                 type: Schema.Types.ObjectId,

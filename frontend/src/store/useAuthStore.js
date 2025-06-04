@@ -10,4 +10,20 @@ const useAuthStore = create((set) => ({
   setUserAvatar: (value) => set({ userAvatar: value }),
 }));
 
+import { persist } from "zustand/middleware";
+
+const usePreferencesStore = create(
+  persist(
+    (set) => ({
+      interests: [],
+      setUserInterests: (value) => set({ interests: value }),
+    }),
+    {
+      name: "user-preferences", // Key in localStorage
+      getStorage: () => localStorage, // Optional, defaults to localStorage
+    }
+  )
+);
+
+export { usePreferencesStore };
 export default useAuthStore;
