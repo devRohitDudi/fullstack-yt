@@ -59,7 +59,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
     // getting local path
     const coverImageResult = "";
-    const avatarLocalPath = req.files?.avatar[0]?.path;
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
     if (
         req.files &&
         Array.isArray(req.files.coverImage) &&
@@ -69,7 +69,8 @@ const registerUser = asyncHandler(async (req, res) => {
         coverImageResult = await uploadOnCloudinary(coverImageLocalPath);
     }
     if (!avatarLocalPath) {
-        throw new ApiError(410, "Avatar file is required on server.");
+        throw new ApiError("Avatar file is required on server.");
+        return;
     }
 
     // upload on cloudinary
@@ -303,13 +304,11 @@ const changeUserPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     const user = req.user;
     if (!user) {
-        return res
-            .status(200)
-            .json(new ApiError(300, "current user not found "));
+        throw new ApiError("No current user. please login");
     }
     return res
         .status(200)
-        .json(new ApiResponse(200, req.user, "current user fetched"));
+        .json(new ApiResponse(200, { user: req.user }, "current user fetched"));
 }); //success
 
 const updateDetails = asyncHandler(async (req, res) => {
@@ -415,46 +414,6 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     if (!req.user._id) {
         throw new ApiError("login is required to get watchHistory");
     }
-    // const user = await User.aggregate([
-    //     {
-    //         $match: {
-    //             _id: new mongoose.Types.ObjectId(req.user._id)
-    //         }
-    //     },
-
-    //     {
-    //         $lookup: {
-    //             from: "videos",
-    //             localField: "watchHistory",
-    //             foreignField: "_id",
-    //             as: "watchHistory",
-    //             pipeline: [
-    //                 {
-    //                     $lookup: {
-    //                         from: "users",
-    //                         localField: "owner",
-    //                         foreignField: "_id",
-    //                         as: "owner",
-    //                         pipeline: [
-    //                             {
-    //                                 $project: {
-    //                                     fullName: 1,
-    //                                     username: 1,
-    //                                     avatar: 1
-    //                                 }
-    //                             }
-    //                         ]
-    //                     }
-    //                 },
-    //                 {
-    //                     $addFields: {
-    //                         $first: "$owner"
-    //                     }
-    //                 }
-    //             ]
-    //         }
-    //     }
-    // ]);
 
     const user = await User.aggregate([
         {

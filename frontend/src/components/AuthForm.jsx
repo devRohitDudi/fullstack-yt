@@ -94,8 +94,8 @@ const AuthForm = ({ type }) => {
 
       // Redirect to home page
       window.location.href = "/";
-    } catch (err) {
-      setError(err.message || err);
+    } catch (error) {
+      setError(error.response.data.message || err);
     } finally {
       setLoading(false);
     }

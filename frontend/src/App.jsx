@@ -34,10 +34,11 @@ function App() {
             withCredentials: "include",
           }
         );
+
         if (response.status === 200) {
-          setUserAvatar(response.data.message.avatar);
+          setUserAvatar(response.data.message.user.avatar);
           setIsLoggedIn(true);
-          setCurrentUsername(response.data.message.username);
+          setCurrentUsername(response.data.message.user.username);
         } else {
           setIsLoggedIn(false);
         }
