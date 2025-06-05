@@ -15,13 +15,19 @@ import { Post } from "../models/post.model.js";
 const getChannelProfile = asyncHandler(async (req, res) => {
     const { username } = req.params;
     if (!username) {
-        throw new ApiError("username is required");
+        return res.status(300).json({
+            success: false,
+            message: "username is required"
+        });
     }
 
     const channel = await User.findOne({ username: username });
 
     if (!channel) {
-        throw new ApiError("channel does not found");
+        return res.status(300).json({
+            success: false,
+            message: "channel does not found"
+        });
     }
 
     // a trick for only retrieve isSubscribed if req.user._id is available
@@ -91,7 +97,10 @@ const getChannelProfile = asyncHandler(async (req, res) => {
     const channelInfo = await User.aggregate(pipeline);
 
     if (!channelInfo?.length) {
-        throw new ApiError("channel does not found");
+        return res.status(300).json({
+            success: false,
+            message: "channel does not found"
+        });
     }
 
     console.log("Querying videos count for channel:", channel._id);
@@ -127,7 +136,10 @@ const getChannelVideos = asyncHandler(async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     if (!username) {
-        throw new ApiError("username is required");
+        return res.status(300).json({
+            success: false,
+            message: "username is required"
+        });
     }
     const channel = await User.findOne({ username: username });
     const channelVideos = await Video.find({
@@ -139,7 +151,10 @@ const getChannelVideos = asyncHandler(async (req, res) => {
         .sort({ createdAt: -1 });
 
     if (!channelVideos) {
-        throw new ApiError("error while retrieving channel videos");
+        return res.status(300).json({
+            success: false,
+            message: "error while retrieving channel videos"
+        });
     }
     return res
         .status(200)
@@ -158,13 +173,19 @@ const getChannelPlaylists = asyncHandler(async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     if (!username) {
-        throw new ApiError("username is required to get Playlists");
+        return res.status(300).json({
+            success: false,
+            message: "username is required to get Playlists"
+        });
     }
     const user = req.user;
 
     const channel = await User.findOne({ username: username });
     if (!channel) {
-        throw new ApiError("requested channel does not exist");
+        return res.status(300).json({
+            success: false,
+            message: "requested channel does not exist"
+        });
     }
 
     const channelPlaylists = await Playlist.find({
@@ -189,7 +210,10 @@ const getChannelPlaylists = asyncHandler(async (req, res) => {
 const getChannelAvatar = asyncHandler(async (req, res) => {
     const { username } = req.params;
     if (!username) {
-        throw new ApiError("username is required to get avatar of");
+        return res.status(300).json({
+            success: false,
+            message: "username is required to get avatar of"
+        });
     }
     const userAvatar = await User.find({ username: username }).select("avatar");
 

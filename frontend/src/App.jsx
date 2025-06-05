@@ -31,11 +31,13 @@ function App() {
         const response = await axios.get(
           "http://localhost:4000/api/v1/user/get-current-user",
           {
-            withCredentials: "include",
+            withCredentials: true,
           }
         );
 
         if (response.status === 200) {
+          console.log("current user response:", response);
+
           setUserAvatar(response.data.message.user.avatar);
           setIsLoggedIn(true);
           setCurrentUsername(response.data.message.user.username);
@@ -43,7 +45,7 @@ function App() {
           setIsLoggedIn(false);
         }
       } catch (error) {
-        console.error("get-current-user Error:", error);
+        console.error("get-current-user error:", error);
         setIsLoggedIn(false);
       }
     }

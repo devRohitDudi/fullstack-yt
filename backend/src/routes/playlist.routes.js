@@ -9,11 +9,14 @@ import {
     addToPlaylist,
     removeFromPlaylist,
     getAllPlaylists,
-    updateVideoStatus
+    updateVideoStatus,
+    addToWatchLater
 } from "../controllers/playlist.controller.js";
 
-//TODO: playlist page
+//verified
 router.route("/get-playlist/:playlist_id").get(verifyJWT, getPlaylist);
+//verified
+router.route("/add-to-watch-later/:video_id").patch(verifyJWT, addToWatchLater);
 //verified
 router.route("/get-all-playlists").post(verifyJWT, getAllPlaylists);
 //verified

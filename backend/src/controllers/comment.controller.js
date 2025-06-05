@@ -23,7 +23,10 @@ const getVideoComments = asyncHandler(async (req, res) => {
         .skip(skip)
         .limit(limit);
     if (!comments) {
-        throw new ApiError("error while querying comments");
+        return res.status(300).json({
+            success: false,
+            message: "error while querying comments"
+        });
     }
 
     const userId = req.user?._id || null;
@@ -92,14 +95,23 @@ const addComment = asyncHandler(async (req, res) => {
     const { message } = req.body;
 
     if (!user) {
-        throw new ApiError(303, "login is required to add comments");
+        return res.status(303).json({
+            success: false,
+            message: "login is required to add comments"
+        });
     }
 
     if (!message) {
-        throw new ApiError("Message is required to make comment");
+        return res.status(300).json({
+            success: false,
+            message: "Message is required to make comment"
+        });
     }
     if (!video_obj_id) {
-        throw new ApiError(303, "video_obj_id is required to comment on");
+        return res.status(303).json({
+            success: false,
+            message: "video_obj_id is required to comment on"
+        });
     }
     const createdComment = await Comment.create({
         onVideo: video_obj_id,
@@ -121,22 +133,28 @@ const addComment = asyncHandler(async (req, res) => {
 const deleteComment = asyncHandler(async (req, res) => {
     const user = req.user;
     if (!user) {
-        throw new ApiError(
-            303,
-            "In order to delete this fucking comment, Login is required my friend."
-        );
+        return res.status(303).json({
+            success: false,
+            message: "In order to delete this fucking comment, Login is required my friend."
+        });
     }
     const { comment_obj_id } = req.params;
 
     if (!comment_obj_id) {
-        throw new ApiError("comment_obj_id is required");
+        return res.status(300).json({
+            success: false,
+            message: "comment_obj_id is required"
+        });
     }
     // if the user is owner of video than grant the fucking permission
     //only valid user can delete comment
     const comment = await Comment.findById(comment_obj_id);
     console.log("comment:", comment);
     if (comment.publisher.toString() !== user._id.toString()) {
-        throw new ApiError("You don't have permission to delete this comment");
+        return res.status(300).json({
+            success: false,
+            message: "You don't have permission to delete this comment"
+        });
     }
 
     const deletedComment = await Comment.deleteOne({ _id: comment_obj_id });
@@ -146,7 +164,10 @@ const deleteComment = asyncHandler(async (req, res) => {
             .status(200)
             .json(new ApiResponse(200, {}, "Comment deleted successfully"));
     } else {
-        throw new ApiError("comment not found");
+        return res.status(300).json({
+            success: false,
+            message: "comment not found"
+        });
     }
 });
 
@@ -155,10 +176,16 @@ const likeComment = asyncHandler(async (req, res) => {
     const { comment_obj_id } = req.params;
 
     if (!user) {
-        throw new ApiError("Login is required to like comments");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to like comments"
+        });
     }
     if (!comment_obj_id) {
-        throw new ApiError("comment_obj_id is required to like comments");
+        return res.status(300).json({
+            success: false,
+            message: "comment_obj_id is required to like comments"
+        });
     }
 
     const alreadyLiked = await Like.findOne({
@@ -182,9 +209,10 @@ const likeComment = asyncHandler(async (req, res) => {
                     )
                 );
         } else {
-            throw new ApiError(
-                "Error while creating document for comment like"
-            );
+            return res.status(300).json({
+                success: false,
+                message: "Error while creating document for comment like"
+            });
         }
     } else {
         const removeLike = await alreadyLiked.deleteOne();
@@ -199,7 +227,10 @@ const likeComment = asyncHandler(async (req, res) => {
                     )
                 );
         } else {
-            throw new ApiError("Error while removing already liked document");
+            return res.status(300).json({
+                success: false,
+                message: "Error while removing already liked document"
+            });
         }
     }
 });
@@ -208,10 +239,16 @@ const dislikeComment = asyncHandler(async (req, res) => {
     const { comment_obj_id } = req.params;
 
     if (!user) {
-        throw new ApiError("Login is required to dislike comments");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to dislike comments"
+        });
     }
     if (!comment_obj_id) {
-        throw new ApiError("comment_obj_id is required to dislike comments");
+        return res.status(300).json({
+            success: false,
+            message: "comment_obj_id is required to dislike comments"
+        });
     }
 
     const alreadyDisliked = await Dislike.findOne({
@@ -235,9 +272,10 @@ const dislikeComment = asyncHandler(async (req, res) => {
                     )
                 );
         } else {
-            throw new ApiError(
-                "Error while creating document for comment dislike"
-            );
+            return res.status(300).json({
+                success: false,
+                message: "Error while creating document for comment dislike"
+            });
         }
     } else {
         const removedDislike = await alreadyDisliked.deleteOne();
@@ -252,9 +290,10 @@ const dislikeComment = asyncHandler(async (req, res) => {
                     )
                 );
         } else {
-            throw new ApiError(
-                "Error while removing already disliked document"
-            );
+            return res.status(300).json({
+                success: false,
+                message: "Error while removing already disliked document"
+            });
         }
     }
 });
@@ -264,7 +303,10 @@ const replyOn = asyncHandler(async (req, res) => {
     const { comment_obj_id } = req.params;
     const { message } = req.body;
     if (!user) {
-        throw new ApiError("Login is required to reply on");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to reply on"
+        });
     }
 
     const createdReply = await Comment.create({
@@ -443,7 +485,10 @@ const getPostComments = asyncHandler(async (req, res) => {
     const skip = (page - 1) * limit;
 
     if (!post_id) {
-        throw new ApiError("Where is fucking post_id eh?");
+        return res.status(300).json({
+            success: false,
+            message: "Where is fucking post_id eh?"
+        });
     }
 
     const comments = await Comment.aggregate([

@@ -15,10 +15,16 @@ const createPost = asyncHandler(async (req, res) => {
     const { content } = req.body;
 
     if (!user) {
-        throw new ApiError("Login is required to post content");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to post content"
+        });
     }
     if (!content) {
-        throw new ApiError("Content is required to do post");
+        return res.status(300).json({
+            success: false,
+            message: "Content is required to do post"
+        });
     }
 
     const photosCount = req.files ? req.files.length : 0;
@@ -38,7 +44,10 @@ const createPost = asyncHandler(async (req, res) => {
             images: uploadedPhotos
         });
         if (!createdPost) {
-            throw new ApiError("Error occured while creating post");
+            return res.status(300).json({
+                success: false,
+                message: "Error occured while creating post"
+            });
         }
         return res
             .status(200)
@@ -51,7 +60,10 @@ const createPost = asyncHandler(async (req, res) => {
             owner: user._id
         });
         if (!createdPost) {
-            throw new ApiError("Error occured while creating post");
+            return res.status(300).json({
+                success: false,
+                message: "Error occured while creating post"
+            });
         }
         return res
             .status(200)
@@ -68,18 +80,27 @@ const getChannelPosts = asyncHandler(async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     if (!username) {
-        throw new ApiError("username is required to get posts");
+        return res.status(300).json({
+            success: false,
+            message: "username is required to get posts"
+        });
     }
 
     const channel = await User.findOne({ username: username });
 
     if (!channel) {
-        throw new ApiError("requested channel does not exist");
+        return res.status(300).json({
+            success: false,
+            message: "requested channel does not exist"
+        });
     }
     const posts = await Post.find({ owner: channel._id }).limit(20).lean();
 
     if (!posts) {
-        throw new ApiError("can't fetch posts! maybe invalid _id.");
+        return res.status(300).json({
+            success: false,
+            message: "can't fetch posts! maybe invalid _id."
+        });
     }
 
     const postsWithInfo = await Promise.all(
@@ -118,12 +139,18 @@ const getPost = asyncHandler(async (req, res) => {
     const user = req.user;
     const { post_id } = req.params;
     if (!post_id) {
-        throw new ApiError("post_id is required to get it");
+        return res.status(300).json({
+            success: false,
+            message: "post_id is required to get it"
+        });
     }
 
     const post = await Post.findById(post_id).populate("owner");
     if (!post) {
-        throw new ApiError("post couldn't found. maybe wrong id");
+        return res.status(300).json({
+            success: false,
+            message: "post couldn't found. maybe wrong id"
+        });
     }
 
     const likesCount = await Like.countDocuments({ onPost: post_id });
@@ -255,10 +282,16 @@ const likePost = asyncHandler(async (req, res) => {
     const user = req.user;
     const { post_id } = req.body;
     if (!user) {
-        throw new ApiError("Login is required to like post");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to like post"
+        });
     }
     if (!post_id) {
-        throw new ApiError("post_id is required to like the post");
+        return res.status(300).json({
+            success: false,
+            message: "post_id is required to like the post"
+        });
     }
     const alreadyLiked = await Like.findOne({
         user: user._id,
@@ -281,7 +314,10 @@ const likePost = asyncHandler(async (req, res) => {
                     )
                 );
         } else {
-            throw new ApiError("Error occured while liking post");
+            return res.status(300).json({
+                success: false,
+                message: "Error occured while liking post"
+            });
         }
     } else {
         const removedLike = await alreadyLiked.deleteOne();
@@ -296,7 +332,10 @@ const likePost = asyncHandler(async (req, res) => {
                     )
                 );
         } else {
-            throw new ApiError("Error occured while removing post like ");
+            return res.status(300).json({
+                success: false,
+                message: "Error occured while removing post like"
+            });
         }
     }
 });
@@ -304,10 +343,16 @@ const dislikePost = asyncHandler(async (req, res) => {
     const user = req.user;
     const { post_id } = req.body;
     if (!user) {
-        throw new ApiError("Login is required to dislike post");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to dislike post"
+        });
     }
     if (!post_id) {
-        throw new ApiError("post_id is required to dislike the post");
+        return res.status(300).json({
+            success: false,
+            message: "post_id is required to dislike the post"
+        });
     }
     const alreadyDisliked = await Dislike.findOne({
         onPost: post_id,
@@ -330,7 +375,10 @@ const dislikePost = asyncHandler(async (req, res) => {
                     )
                 );
         } else {
-            throw new ApiError("Error occured while disliking post");
+            return res.status(300).json({
+                success: false,
+                message: "Error occured while disliking post"
+            });
         }
     } else {
         const removedDislike = await alreadyDisliked.deleteOne();
@@ -345,7 +393,10 @@ const dislikePost = asyncHandler(async (req, res) => {
                     )
                 );
         } else {
-            throw new ApiError("Error occured while removing post dislike ");
+            return res.status(300).json({
+                success: false,
+                message: "Error occured while removing post dislike"
+            });
         }
     }
 });
@@ -354,10 +405,16 @@ const addPostComment = asyncHandler(async (req, res) => {
     const user = req.user;
     const { post_id, message } = req.body;
     if (!user) {
-        throw new ApiError("Login is required to add comments");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to add comments"
+        });
     }
     if (!post_id || !message) {
-        throw new ApiError("post_id and message are required. check req.body");
+        return res.status(300).json({
+            success: false,
+            message: "post_id and message are required. check req.body"
+        });
     }
 
     const comment = await Comment.create({
@@ -366,7 +423,10 @@ const addPostComment = asyncHandler(async (req, res) => {
         message: message
     });
     if (!comment) {
-        throw new ApiError("comment couldn't create");
+        return res.status(300).json({
+            success: false,
+            message: "comment couldn't create"
+        });
     }
     return res
         .status(200)
@@ -379,10 +439,16 @@ const deletePostComment = asyncHandler(async (req, res) => {
     const user = req.user;
     const { comment_id } = req.body;
     if (!user) {
-        throw new ApiError("login is required to delete your comments");
+        return res.status(300).json({
+            success: false,
+            message: "login is required to delete your comments"
+        });
     }
     if (!comment_id) {
-        throw new ApiError("Where is fucking comment_id eh?");
+        return res.status(300).json({
+            success: false,
+            message: "Where is fucking comment_id eh?"
+        });
     }
     const authorizedComment = await Comment.findOne({
         _id: comment_id,
@@ -395,7 +461,10 @@ const deletePostComment = asyncHandler(async (req, res) => {
                 .status(200)
                 .json(new ApiError(200, {}, "Comment deleted successfully"));
         } else {
-            throw new ApiError("error occured while deleting post comment");
+            return res.status(300).json({
+                success: false,
+                message: "error occured while deleting post comment"
+            });
         }
     }
 });

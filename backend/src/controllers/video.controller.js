@@ -16,12 +16,18 @@ const uploadVideo = asyncHandler(async (req, res) => {
     const { title, description, tags = null, visibility } = req.body;
 
     if (!title) {
-        throw new ApiError("Title is required");
+        return res.status(300).json({
+            success: false,
+            message: "Title is required"
+        });
     }
 
     const user = await req.user;
     if (!user) {
-        throw new ApiError("Login is required to upload videos");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to upload videos"
+        });
     }
 
     const videoFile = req.files?.video?.[0];
@@ -36,7 +42,10 @@ const uploadVideo = asyncHandler(async (req, res) => {
     ];
 
     if (!videoFileLocalPath) {
-        throw new ApiError(300, "Video file is required");
+        return res.status(300).json({
+            success: false,
+            message: "Video file is required"
+        });
     }
 
     // Validate extension
@@ -87,7 +96,10 @@ const uploadVideo = asyncHandler(async (req, res) => {
         owner: await user._id
     });
     if (!videoInSchema) {
-        throw new ApiError("error while video document creation ");
+        return res.status(300).json({
+            success: false,
+            message: "error while video document creation"
+        });
     }
     // yeah it is created successfully
     console.log("videoInSchema:", videoInSchema);
@@ -164,7 +176,6 @@ const homeVideos = asyncHandler(async (req, res) => {
             .skip(skip)
             .limit(limit)
             .populate("owner", "avatar fullName username");
-        console.log({ skip, limit });
 
         return res
             .status(200)
@@ -178,7 +189,10 @@ const getVideo = asyncHandler(async (req, res) => {
         "-dislikes -likes -tags -comments"
     );
     if (!video) {
-        throw new ApiError(300, "video couldn't found");
+        return res.status(300).json({
+            success: false,
+            message: "video couldn't found"
+        });
     }
     const channel = await User.findById({ _id: video.owner }).select(
         "username fullName avatar"
@@ -227,7 +241,10 @@ const getVideo = asyncHandler(async (req, res) => {
                 )
             );
         } else if (video.visibility == "private") {
-            throw new ApiError("Requested video is private ");
+            return res.status(300).json({
+                success: false,
+                message: "Requested video is private"
+            });
         }
     }
 
@@ -250,7 +267,10 @@ const getVideo = asyncHandler(async (req, res) => {
             )
         );
     } else if (video.visibility == "private") {
-        throw new ApiError("Requested video is private ");
+        return res.status(300).json({
+            success: false,
+            message: "Requested video is private"
+        });
     }
 });
 
@@ -259,7 +279,10 @@ const addLike = asyncHandler(async (req, res) => {
     const user = req.user;
 
     if (!user) {
-        throw new ApiError(300, "login is required to like the video");
+        return res.status(300).json({
+            success: false,
+            message: "login is required to like the video"
+        });
     }
 
     const alreadyLiked = await Like.findOne({
@@ -312,11 +335,17 @@ const addViewAndHistory = asyncHandler(async (req, res) => {
     const { video_obj_id } = req.params;
     const user = req.user;
     if (!video_obj_id) {
-        throw new ApiError("video_obj_id is required to add view into");
+        return res.status(300).json({
+            success: false,
+            message: "video_obj_id is required to add view into"
+        });
     }
     const video = await Video.findById(video_obj_id);
     if (!video) {
-        throw new ApiError("Requested video not found");
+        return res.status(300).json({
+            success: false,
+            message: "Requested video not found"
+        });
     }
     video.views += 1;
 
@@ -357,14 +386,17 @@ const addViewAndHistory = asyncHandler(async (req, res) => {
             return res
                 .status(200)
                 .json(
-                    new ApiError(
+                    new ApiResponse(
                         200,
                         { message: "view added & video added to watchHistory" },
                         "view added & video added to watchHistory"
                     )
                 );
         } else {
-            throw new ApiError("Error occured while adding to watch history");
+            return res.status(300).json({
+                success: false,
+                message: "Error occured while adding to watch history"
+            });
         }
     }
 });
@@ -372,7 +404,10 @@ const addViewAndHistory = asyncHandler(async (req, res) => {
 const getWatchHistory = asyncHandler(async (req, res) => {
     const user = req.user;
     if (!user) {
-        throw new ApiError("Login is required to get watchHistory");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to get watchHistory"
+        });
     }
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit) || 10;

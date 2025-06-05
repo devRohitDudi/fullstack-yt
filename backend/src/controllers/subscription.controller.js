@@ -22,7 +22,10 @@ const subscribeChannel = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
 
     if (!channelId) {
-        throw new ApiError(300, "channel id is required to subscribe.");
+        return res.status(300).json({
+            success: false,
+            message: "channel id is required to subscribe."
+        });
     }
 
     //check if channel is exists or not
@@ -31,11 +34,17 @@ const subscribeChannel = asyncHandler(async (req, res) => {
     });
 
     if (user._id.toString() == channelExistence._id.toString()) {
-        throw new ApiError("You can't subscribe yourself");
+        return res.status(300).json({
+            success: false,
+            message: "You can't subscribe yourself"
+        });
     }
 
     if (!channelExistence) {
-        throw new ApiError(400, "requested channel doesn't exist");
+        return res.status(400).json({
+            success: false,
+            message: "requested channel doesn't exist"
+        });
     }
 
     console.log("channelExistence: ", channelExistence);

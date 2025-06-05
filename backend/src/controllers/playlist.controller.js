@@ -14,14 +14,23 @@ const getPlaylist = asyncHandler(async (req, res) => {
     const user = req.user;
     const { playlist_id } = req.params;
     if (!playlist_id) {
-        throw new ApiError("playlist_id is required");
+        return res.status(300).json({
+            success: false,
+            message: "playlist_id is required"
+        });
     }
     if (!playlist_id || typeof playlist_id !== "string") {
-        throw new ApiError("playlist_id must be a valid string");
+        return res.status(300).json({
+            success: false,
+            message: "playlist_id must be a valid string"
+        });
     }
 
     if (!mongoose.Types.ObjectId.isValid(playlist_id)) {
-        throw new ApiError("Invalid playlist_id format");
+        return res.status(300).json({
+            success: false,
+            message: "Invalid playlist_id format"
+        });
     }
 
     const playlist = await Playlist.findById(playlist_id).populate({
@@ -32,7 +41,10 @@ const getPlaylist = asyncHandler(async (req, res) => {
     const isOwner = (await playlist.owner.toString()) === user._id.toString();
 
     if (!playlist) {
-        throw new ApiError("Playlist couldn't retrieve");
+        return res.status(300).json({
+            success: false,
+            message: "Playlist couldn't retrieve"
+        });
     }
     if (playlist.visibility == "private") {
         if (user._id.toString() === playlist.owner.toString()) {
@@ -47,7 +59,10 @@ const getPlaylist = asyncHandler(async (req, res) => {
                 )
             );
         } else {
-            throw new ApiError("requested playlist is private");
+            return res.status(300).json({
+                success: false,
+                message: "requested playlist is private"
+            });
         }
     }
     return res
@@ -63,7 +78,10 @@ const getAllPlaylists = asyncHandler(async (req, res) => {
     console.log("currentVideo", currentVideo);
 
     if (!user) {
-        throw new ApiError("Login is required to get all playlists");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to get all playlists"
+        });
     }
 
     const userInDb = await User.findOne({ username: user.username });
@@ -104,10 +122,16 @@ const updateVideoStatus = asyncHandler(async (req, res) => {
     const user = req.user;
     const { video_id, containsVideo, playlist_id } = req.body;
     if (!user) {
-        throw new ApiError("login is required to update playlists");
+        return res.status(300).json({
+            success: false,
+            message: "login is required to update playlists"
+        });
     }
     if (!video_id) {
-        throw new ApiError("video_id is required to update playlist");
+        return res.status(300).json({
+            success: false,
+            message: "video_id is required to update playlist"
+        });
     }
     const playlist = await Playlist.findById(playlist_id);
     if (containsVideo) {
@@ -129,7 +153,10 @@ const createPlaylist = asyncHandler(async (req, res) => {
     const user = req.user;
     const { name, description = "", visibility = "private" } = req.body;
     if (!user) {
-        throw new ApiError("login is required to create playlist");
+        return res.status(300).json({
+            success: false,
+            message: "login is required to create playlist"
+        });
     }
     if (!name) {
         throw new ApiError(
@@ -145,7 +172,10 @@ const createPlaylist = asyncHandler(async (req, res) => {
     });
 
     if (!createdPlaylist) {
-        throw new ApiError("playlist couldn't created");
+        return res.status(300).json({
+            success: false,
+            message: "playlist couldn't created"
+        });
     }
 
     await user.playlists.push(createdPlaylist);
@@ -165,15 +195,24 @@ const deletePlaylist = asyncHandler(async (req, res) => {
     const { playlist_id } = req.params;
     const user = req.user;
     if (!playlist_id) {
-        throw new ApiError("Playlist_id is required to delete it");
+        return res.status(300).json({
+            success: false,
+            message: "Playlist_id is required to delete it"
+        });
     }
     if (!user) {
-        throw new ApiError("want to delete playlist eh? login first!");
+        return res.status(300).json({
+            success: false,
+            message: "want to delete playlist eh? login first!"
+        });
     }
     const playlist = await Playlist.findById(playlist_id);
 
     if (!playlist) {
-        throw new ApiError("Playlist not found! maybe already deleted");
+        return res.status(300).json({
+            success: false,
+            message: "Playlist not found! maybe already deleted"
+        });
     }
     if (playlist.owner.toString() !== user._id.toString()) {
         throw new ApiError(
@@ -200,17 +239,29 @@ const addToPlaylist = asyncHandler(async (req, res) => {
     const user = req.user;
 
     if (!playlist_id) {
-        throw new ApiError("Playlist_id is requied to add videos into");
+        return res.status(300).json({
+            success: false,
+            message: "Playlist_id is requied to add videos into"
+        });
     }
     if (!video_id) {
-        throw new ApiError("video_id is required to add into playlist");
+        return res.status(400).json({
+            success: false,
+            message: "video_id is required to add into playlist"
+        });
     }
     if (!user) {
-        throw new ApiError("Login is required to add videos into playlists");
+        return res.status(400).json({
+            success: false,
+            message: "Login is required to add videos into playlists"
+        });
     }
     const video = await Video.findById(video_id);
     if (!video) {
-        throw new ApiError("video not found on databse! maybe wrong id.");
+        return res.status(400).json({
+            success: false,
+            message: "video not found on databse! maybe wrong id."
+        });
     }
 
     const updatedPlaylist = await Playlist.findOneAndUpdate(
@@ -222,17 +273,6 @@ const addToPlaylist = asyncHandler(async (req, res) => {
     if (!updatedPlaylist) {
         throw new ApiError("Plalist not found or Unauthorized access");
     }
-
-    // now no need for this, only 1 db call is efficient
-    // const playlist = await Playlist.findById(playlist_id);
-    // if (!playlist) {
-    // throw new ApiError("Playlist not found");
-    // }
-    // if (user._id.toString() !== (await playlist.owner.toString())) {
-    //     throw new ApiError(
-    //         "Unauthorized access! you cannot update this playlist"
-    //     );
-    // }
 
     return res
         .status(200)
@@ -279,12 +319,53 @@ const removeFromPlaylist = asyncHandler(async (req, res) => {
         );
 });
 
+const addToWatchLater = asyncHandler(async (req, res) => {
+    const { video_id } = req.params;
+    const user = req.user;
+
+    if (!user) {
+        return res.status(400).json({
+            success: false,
+            message: "Authentication is required to add to watch later"
+        });
+    }
+
+    if (!video_id) {
+        return res.status(400).json({
+            success: false,
+            message: "video_id is required to add to watch"
+        });
+    }
+
+    const video = await Video.findById(video_id);
+
+    if (!video) {
+        return res.status(400).json({
+            success: false,
+            message: "Video not found on databse. maybe wrong id"
+        });
+    }
+
+    const updatedWatchLater = await Playlist.findOneAndUpdate(
+        { name: "Watch later", owner: user._id },
+        { $addToSet: { videos: video_id } },
+        { new: true }
+    );
+
+    return res.status(200).json({
+        success: true,
+        data: updatedWatchLater,
+        message: "video added to watch later playlist"
+    });
+});
+
 export {
     getPlaylist,
     createPlaylist,
     deletePlaylist,
     addToPlaylist,
     removeFromPlaylist,
+    addToWatchLater,
     getAllPlaylists,
     updateVideoStatus
 };

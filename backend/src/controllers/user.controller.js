@@ -16,10 +16,10 @@ const generateAccessAndRefreshTokens = async (userId) => {
         await currentUser.save({ validateBeforeSave: false });
         return { accessToken, refreshToken };
     } catch (error) {
-        throw new ApiError(
-            400,
-            "Something went wrong while generating access and refresh token."
-        );
+        return res.status(400).json({
+            success: false,
+            message: error.message || "Error generating tokens"
+        });
     }
 }; // utils
 
@@ -42,7 +42,10 @@ const registerUser = asyncHandler(async (req, res) => {
             (field) => field.trim() === ""
         )
     ) {
-        throw new ApiError(408, "All fields are required.");
+        return res.status(408).json({
+            success: false,
+            message: "All fields are required."
+        });
     }
 
     const userExistence = await User.findOne({
@@ -52,10 +55,10 @@ const registerUser = asyncHandler(async (req, res) => {
     console.log("userExistence: ", userExistence);
 
     if (userExistence) {
-        throw new ApiError(
-            409,
-            "A user is already exists with this email or username."
-        );
+        return res.status(409).json({
+            success: false,
+            message: "A user is already exists with this email or username."
+        });
     }
     // getting local path
     const coverImageResult = "";
@@ -69,14 +72,19 @@ const registerUser = asyncHandler(async (req, res) => {
         coverImageResult = await uploadOnCloudinary(coverImageLocalPath);
     }
     if (!avatarLocalPath) {
-        throw new ApiError("Avatar file is required on server.");
-        return;
+        return res.status(400).json({
+            success: false,
+            message: "Avatar file is required on server."
+        });
     }
 
     // upload on cloudinary
     const avatarResult = await uploadOnCloudinary(avatarLocalPath);
     if (!avatarResult) {
-        throw new ApiError(411, "avatar file is required on Cloud.");
+        return res.status(504).json({
+            success: false,
+            message: "Avatar file is required on Cloud."
+        });
     }
 
     // create user in databse
@@ -103,10 +111,10 @@ const registerUser = asyncHandler(async (req, res) => {
     );
 
     if (!createdUser) {
-        throw new ApiError(
-            501,
-            "Failed to register user (please check database code)"
-        );
+        return res.status(400).json({
+            success: false,
+            message: "Failed to register user (please check database code"
+        });
     }
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
         createdUser._id
@@ -114,7 +122,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: false
+        secure: true
     };
     if (createdUser) {
         return res
@@ -141,13 +149,19 @@ const loginUser = asyncHandler(async (req, res) => {
     // return secure cookies
 
     if (!req.body) {
-        throw new ApiError("No form data provided. error from backend");
+        return res.status(400).json({
+            success: false,
+            message: "No form data provided. error from backend."
+        });
     }
     const { username = null, email = null, password = null } = req.body;
     console.log("req.body: ", req.body);
 
     if (!email && !username) {
-        throw new ApiError(300, "username or email is required to login.");
+        return res.status(400).json({
+            success: false,
+            message: "username or email is required to login."
+        });
     }
 
     const userInstance = await User.findOne({
@@ -155,7 +169,10 @@ const loginUser = asyncHandler(async (req, res) => {
     });
 
     if (!userInstance) {
-        throw new ApiError("User does not exist");
+        return res.status(400).json({
+            success: false,
+            message: "User does not exist"
+        });
     }
     console.log("userInstance: ", userInstance);
 
@@ -163,7 +180,10 @@ const loginUser = asyncHandler(async (req, res) => {
     const isPasswordValid = await userInstance.isPasswordCorrect(password);
 
     if (!isPasswordValid) {
-        throw new ApiError("Invalid password");
+        return res.status(400).json({
+            success: false,
+            message: "Invalid password"
+        });
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
@@ -172,7 +192,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: false
+        secure: true
     };
 
     const loggedInUser = await User.findById(userInstance._id).select(
@@ -221,7 +241,10 @@ const refreshTheAccessToken = asyncHandler(async (req, res) => {
         req.cookies?.refreshToken || req.body.refreshToken;
 
     if (!incomingRefreshToken) {
-        throw new ApiError(300, "Unathorized request");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required."
+        });
     }
     const decodedRefreshToken = await jwt.verify(
         incomingRefreshToken,
@@ -232,7 +255,10 @@ const refreshTheAccessToken = asyncHandler(async (req, res) => {
     const requesterUser = await User.findById(decodedRefreshToken._id);
 
     if (!requesterUser) {
-        throw new ApiError(400, "invalid refresh token");
+        return res.status(400).json({
+            success: false,
+            message: "invalid refresh token"
+        });
     }
     console.log("requesterUser.refreshToken: ", requesterUser.refreshToken);
     console.log("decodedRefreshToken: ", decodedRefreshToken);
@@ -266,17 +292,26 @@ const refreshTheAccessToken = asyncHandler(async (req, res) => {
                     )
                 );
         } catch (error) {
-            throw new ApiError(400, error.message || "Error generating tokens");
+            return res.status(400).json({
+                success: false,
+                message: error.message || "Error generating tokens"
+            });
         }
     } else {
-        throw new ApiError(200, "refresh token is expired or used.");
+        return res.status(200).json({
+            success: false,
+            message: "refresh token is expired or used."
+        });
     }
 }); //success
 
 const changeUserPassword = asyncHandler(async (req, res) => {
     const user = req.user;
     if (!user) {
-        throw new ApiError("Login is required.");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required."
+        });
     }
     const { oldPassword, newPassword } = req.body;
 
@@ -285,7 +320,10 @@ const changeUserPassword = asyncHandler(async (req, res) => {
     const isCorrect = await userInDB.isPasswordCorrect(oldPassword);
 
     if (!isCorrect) {
-        throw new ApiError("incorrect old password");
+        return res.status(300).json({
+            success: false,
+            message: "incorrect old password"
+        });
     }
 
     // for encryption of password there's a method in Schema .pre on save()
@@ -303,18 +341,35 @@ const changeUserPassword = asyncHandler(async (req, res) => {
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     const user = req.user;
+
     if (!user) {
-        throw new ApiError("No current user. please login");
+        return res.status(401).json({
+            success: false,
+            message: "Please login to continue"
+        });
     }
-    return res
-        .status(200)
-        .json(new ApiResponse(200, { user: req.user }, "current user fetched"));
+    return res.status(200).json({
+        statusCode: 200,
+        data: null,
+        message: {
+            user: {
+                username: user.username,
+                avatar: user.avatar,
+                fullName: user.fullName,
+                email: user.email
+            }
+        },
+        success: true
+    });
 }); //success
 
 const updateDetails = asyncHandler(async (req, res) => {
     const user = req.user;
     if (!user) {
-        throw new ApiError("Login is required to update details");
+        return res.status(300).json({
+            success: false,
+            message: "Login is required to update details"
+        });
     }
     const details = req.body || {};
 
@@ -350,12 +405,18 @@ const updateAvatar = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.file?.path;
 
     if (!avatarLocalPath) {
-        throw new ApiError("avatar file is required");
+        return res.status(300).json({
+            success: false,
+            message: "avatar file is required"
+        });
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     if (!avatar.url) {
-        throw new ApiError("error while uploading avatar");
+        return res.status(300).json({
+            success: false,
+            message: "error while uploading avatar"
+        });
     }
 
     const user = await User.findById(req.user._id);
@@ -382,12 +443,18 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     const coverImageLocalPath = req.file?.path;
 
     if (!coverImageLocalPath) {
-        throw new ApiError("cover image is required to update it");
+        return res.status(300).json({
+            success: false,
+            message: "cover image is required to update it"
+        });
     }
 
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
     if (!coverImage.url) {
-        throw new ApiError("error while uploading coverImage");
+        return res.status(300).json({
+            success: false,
+            message: "error while uploading coverImage"
+        });
     }
 
     const user = await User.findById(req.user._id);
@@ -412,7 +479,10 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 
 const getWatchHistory = asyncHandler(async (req, res) => {
     if (!req.user._id) {
-        throw new ApiError("login is required to get watchHistory");
+        return res.status(300).json({
+            success: false,
+            message: "login is required to get watchHistory"
+        });
     }
 
     const user = await User.aggregate([
