@@ -224,8 +224,6 @@ const getVideo = asyncHandler(async (req, res) => {
             return res.status(200).json(
                 new ApiResponse(
                     200,
-                    // Host your own redirect endpoint
-                    // load the video
                     {
                         video,
                         commentsCount,
@@ -362,12 +360,12 @@ const addViewAndHistory = asyncHandler(async (req, res) => {
                 )
             );
     } else {
-        const alreadInhistory = await History.findOne({
+        const alreadInHistory = await History.findOne({
             user: user._id,
             video: video._id
         });
 
-        if (alreadInhistory) {
+        if (alreadInHistory) {
             return res.status(200).json(
                 new ApiResponse(
                     200,

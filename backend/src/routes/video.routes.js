@@ -37,7 +37,7 @@ router.route("/upload").post(
 );
 
 //verified
-router.route("/watch/:video_obj_id").get(verifyJWT, getVideo);
+router.route("/get-video/:video_obj_id").get(verifyJWT, getVideo);
 
 router.route("/home").post(verifyJWT, homeVideos);
 
