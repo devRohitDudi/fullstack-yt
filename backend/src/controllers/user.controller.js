@@ -176,7 +176,6 @@ const loginUser = asyncHandler(async (req, res) => {
             message: "User does not exist"
         });
     }
-    console.log("userInstance: ", userInstance);
 
     // using the injected method of bcrypt in userSchema
     const isPasswordValid = await userInstance.isPasswordCorrect(password);
