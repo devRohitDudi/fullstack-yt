@@ -11,7 +11,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
             req.header("Authorization")?.replace("Bearer ", "");
 
         if (!token) {
-            console.log("did not found token in auth middleware");
+            console.log("did not found token in verifyJWT middleware");
             next();
         } else {
             console.log("token found in middleware");
@@ -24,7 +24,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
         if (!authUser) {
             next();
         }
-        req.user =  authUser;
+        req.user = authUser;
         next();
     } catch (error) {
         console.log("couldn't verify user");
@@ -40,7 +40,7 @@ const authJWT = asyncHandler(async (req, res, next) => {
         if (!token) {
             return res.status(401).json({
                 success: false,
-                message: "Unauthorized request. No token provided"
+                message: "Unauthorized request. returned from authJWT"
             });
         }
 
@@ -53,7 +53,7 @@ const authJWT = asyncHandler(async (req, res, next) => {
         if (!authUser) {
             return res.status(401).json({
                 success: false,
-                message: "Unauthorized request - Invalid token"
+                message: "Unauthorized request - Invalid token, returned from authJWT"
             });
         }
 
@@ -62,9 +62,9 @@ const authJWT = asyncHandler(async (req, res, next) => {
     } catch (error) {
         return res.status(401).json({
             success: false,
-            message: "Unauthorized request - Invalid token"
+            message: "Unauthorized request - Invalid token, returned from authJWT"
         });
     }
 });
 
-export { verifyJWT,authJWT };
+export { verifyJWT, authJWT };
