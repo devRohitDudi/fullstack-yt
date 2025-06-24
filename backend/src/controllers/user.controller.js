@@ -148,6 +148,8 @@ const loginUser = asyncHandler(async (req, res) => {
     //  access & refresh token
     // return secure cookies
 
+    console.log("Login controller invoked");
+
     if (!req.body) {
         return res.status(400).json({
             success: false,
@@ -341,6 +343,7 @@ const changeUserPassword = asyncHandler(async (req, res) => {
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     const user = req.user;
+    console.log("get-current-user invoked");
 
     if (!user) {
         return res.status(401).json({
