@@ -4,7 +4,6 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 import {
     likeComment,
-    addComment,
     getVideoComments,
     deleteComment,
     dislikeComment,
@@ -15,8 +14,6 @@ import {
 
 const router = Router();
 
-// verified // can add middleware to filter bad comments
-router.route("/add-comment/:video_obj_id").post(verifyJWT, addComment);
 
 // verified
 router.route("/delete-comment/:comment_obj_id").patch(verifyJWT, deleteComment);

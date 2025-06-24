@@ -89,47 +89,6 @@ const getVideoComments = asyncHandler(async (req, res) => {
     }
 });
 
-const addComment = asyncHandler(async (req, res) => {
-    const { video_obj_id } = req.params;
-    const user = req.user;
-    const { message } = req.body;
-
-    if (!user) {
-        return res.status(303).json({
-            success: false,
-            message: "login is required to add comments"
-        });
-    }
-
-    if (!message) {
-        return res.status(300).json({
-            success: false,
-            message: "Message is required to make comment"
-        });
-    }
-    if (!video_obj_id) {
-        return res.status(303).json({
-            success: false,
-            message: "video_obj_id is required to comment on"
-        });
-    }
-    const createdComment = await Comment.create({
-        onVideo: video_obj_id,
-        message: message,
-        publisher: user._id
-    });
-
-    return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                { createdComment },
-                "comment added successfully"
-            )
-        );
-});
-
 const deleteComment = asyncHandler(async (req, res) => {
     const user = req.user;
     if (!user) {
@@ -635,7 +594,6 @@ const getPostComments = asyncHandler(async (req, res) => {
 export {
     getVideoComments,
     likeComment,
-    addComment,
     deleteComment,
     dislikeComment,
     replyOn,

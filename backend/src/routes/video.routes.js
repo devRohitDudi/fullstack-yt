@@ -9,12 +9,11 @@ import {
     uploadVideo,
     removeFromWatchHistory,
     getWatchHistory,
-    homeVideos
+    homeVideos, addVideoComment
 } from "../controllers/video.controller.js";
 
 import {
     likeComment,
-    addComment,
     getVideoComments,
     deleteComment,
     dislikeComment,
@@ -45,6 +44,12 @@ router.route("/home").post(verifyJWT, homeVideos);
 router
     .route("/add-view-history/:video_obj_id")
     .patch(verifyJWT, addViewAndHistory);
+
+// verified 
+// can add middleware to filter bad comments
+router.route("/add-comment/:video_obj_id").post(verifyJWT, addVideoComment);
+
+
 
 router.route("/get-watch-history").get(verifyJWT, getWatchHistory);
 
