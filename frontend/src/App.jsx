@@ -21,6 +21,8 @@ import CreatePost from "./pages/CreatePost.jsx";
 import PostPage from "./pages/PostPage.jsx";
 import axios from "axios";
 
+const backendAddress = "@https://fullstack-yt.onrender.com";
+
 function App() {
   const { setIsLoggedIn, setCurrentUsername, userAvatar, setUserAvatar } =
     useAuthStore();
@@ -29,7 +31,7 @@ function App() {
     async function getUser() {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/v1/user/get-current-user",
+          `${backendAddress}/api/v1/user/get-current-user`,
           {
             withCredentials: true,
           }

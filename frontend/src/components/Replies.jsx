@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import useAuthStore from "../store/useAuthStore";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 function ReplyCard({ reply }) {
   const { currentUsername } = useAuthStore();
   const isAuthor = reply.publisher.username === currentUsername;
@@ -59,7 +62,7 @@ function ReplyCard({ reply }) {
     }
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/video/like-comment/${reply._id}`,
+        `${backendAddress}/api/v1/video/like-comment/${reply._id}`,
         {},
         {
           withCredentials: "include",
@@ -88,7 +91,7 @@ function ReplyCard({ reply }) {
     }
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/video/dislike-comment/${reply._id}`,
+        `${backendAddress}/api/v1/video/dislike-comment/${reply._id}`,
         {},
         {
           withCredentials: "include",
@@ -105,7 +108,7 @@ function ReplyCard({ reply }) {
   async function handleReply() {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/video/reply-on/${reply._id}`,
+        `${backendAddress}/api/v1/video/reply-on/${reply._id}`,
         { message: replyText },
         {
           withCredentials: "include",
@@ -127,7 +130,7 @@ function ReplyCard({ reply }) {
   const deleteReply = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/video/delete-comment/${reply._id}`,
+        `${backendAddress}/api/v1/video/delete-comment/${reply._id}`,
         {},
         {
           withCredentials: "include",
@@ -270,7 +273,7 @@ function Replies({ commentId }) {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://localhost:4000/api/v1/video/get-replies/${commentId}?page=${replyPage}&limit=20`,
+        `${backendAddress}/api/v1/video/get-replies/${commentId}?page=${replyPage}&limit=20`,
         { withCredentials: "include", headers: {} }
       );
 

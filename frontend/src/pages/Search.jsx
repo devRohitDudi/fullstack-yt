@@ -3,6 +3,9 @@ import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import SearchCard from "../components/SearchCard";
 
+const backendAddress = "https://fullstack-yt.onrender.com";
+
+
 const Search = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q");
@@ -14,7 +17,7 @@ const Search = () => {
     const fetchVideos = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/videos/search?q=${query}`);
+        const response = await axios.get(`${backendAddress}/api/v1/videos/search?q=${query}`);
         setVideos(response.data);
         setError(null);
       } catch (err) {
@@ -51,7 +54,7 @@ const Search = () => {
       <h1 className="text-2xl font-bold mb-6">
         Search results for: <span className="text-blue-400">{query}</span>
       </h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {videos.map((video) => (
           <SearchCard key={video._id} video={video} />

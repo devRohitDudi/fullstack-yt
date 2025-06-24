@@ -6,6 +6,8 @@ import VideoCard from "../components/VideoCard.jsx";
 import useClickOutside from "../utils/useClickOutside.js";
 import useAuthStore from "../store/useAuthStore.js";
 import { usePreferencesStore } from "../store/useAuthStore.js";
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 const HomePage = ({ sidebarOpen }) => {
   const [videos, setVideos] = useState([]);
   //   const [page, setPage] = useState(1);
@@ -24,10 +26,8 @@ const HomePage = ({ sidebarOpen }) => {
   const [newPlaylistVisibility, setNewPlaylistVisibility] = useState("private");
   const { isLoggedIn, currentUsername } = useAuthStore();
 
-  const backendDomain = `https://fullstack-yt.onrender.com`;
-
   const { interests, setUserInterests } = usePreferencesStore();
-  const handleSetInterests = async () => {};
+  const handleSetInterests = async () => { };
 
   const fetchSomeVideos = async () => {
     if (isFetching || isFetched.current) return;
@@ -35,7 +35,7 @@ const HomePage = ({ sidebarOpen }) => {
     try {
       setIsFetching(true);
       const response = await axios.post(
-        `http://localhost:4000/api/v1/video/home?limit=10&page=${page}`,
+        `${backendAddress}/api/v1/video/home?limit=10&page=${page}`,
         {
           localInterests: interests,
         },
@@ -70,7 +70,7 @@ const HomePage = ({ sidebarOpen }) => {
     try {
       setPlaylistsLoading(true);
       const response = await axios.post(
-        `http://localhost:4000/api/v1/playlist/get-all-playlists`,
+        `${backendAddress}/api/v1/playlist/get-all-playlists`,
         { currentVideo: currentVideo.video._id },
         {
           withCredentials: "include",
@@ -94,7 +94,7 @@ const HomePage = ({ sidebarOpen }) => {
     try {
       for (const playlist of playlists) {
         const response = await axios.patch(
-          `http://localhost:4000/api/v1/playlist/update-video-status`,
+          `${backendAddress}/api/v1/playlist/update-video-status`,
           {
             video_id: currentVideo.video._id,
             containsVideo: playlist.containsVideo,
@@ -117,7 +117,7 @@ const HomePage = ({ sidebarOpen }) => {
   const createPlaylist = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/playlist/create-playlist`,
+        `${backendAddress}/api/v1/playlist/create-playlist`,
         { name: playlistText, visibility: newPlaylistVisibility },
         { withCredentials: "include", headers: {} }
       );
@@ -134,7 +134,7 @@ const HomePage = ({ sidebarOpen }) => {
       const videoId = currentVideo.video._id.toString();
 
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/playlist/add-to-watch-later/${videoId}`,
+        `${backendAddress}/api/v1/playlist/add-to-watch-later/${videoId}`,
         {},
         { withCredentials: true, headers: {} }
       );
@@ -243,7 +243,7 @@ const HomePage = ({ sidebarOpen }) => {
           </button>
           <button
             onClick={() =>
-              copyToClipboard(`${backendDomain}/watch?v=${currentVideo._id}`)
+              copyToClipboard(`${backendAddress}/watch?v=${currentVideo._id}`)
             }
             className="flex gap-1"
           >

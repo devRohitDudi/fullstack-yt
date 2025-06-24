@@ -2,6 +2,11 @@ import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { User, Upload, X } from "lucide-react";
+import useAuthStore from "../store/useAuthStore.js";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
+
 
 const AuthForm = ({ type }) => {
   const [formData, setFormData] = useState({
@@ -17,6 +22,10 @@ const AuthForm = ({ type }) => {
   const [loading, setLoading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const avatarInputRef = useRef(null);
+  const { isLoggedIn, currentUsername } = useAuthStore();
+  if (isLoggedIn) {
+    window.location.href = "/";
+  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -82,18 +91,21 @@ const AuthForm = ({ type }) => {
 
       const endpoint =
         type === "login"
-          ? "http://localhost:4000/api/v1/user/login"
-          : "http://localhost:4000/api/v1/user/register";
-      await axios.post(endpoint, formDataToSend, {
+          ? `${backendAddress}/api/v1/user/login`
+          : `${backendAddress}/api/v1/user/register`;
+      const response = await axios.post(endpoint, formDataToSend, {
         headers: {
           // Let browser set Content-Type for FormData
           Accept: "application/json", // Backend likely expects this
         },
         withCredentials: true, // For CORS cookies
       });
+      console.log("Login response:", response);
+      console.log("condition is:", response.data.statusCode);
 
-      // Redirect to home page
-      window.location.href = "/";
+      if (response.data.success == true) {
+        window.location.href = "/";
+      }
     } catch (error) {
       setError(error.response.data.message || err);
     } finally {
@@ -298,11 +310,10 @@ const AuthForm = ({ type }) => {
             <button
               type="submit"
               disabled={loading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white ${
-                loading
-                  ? "bg-blue-600/50 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              }`}
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white ${loading
+                ? "bg-blue-600/50 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                }`}
             >
               {loading ? (
                 <span className="flex items-center">

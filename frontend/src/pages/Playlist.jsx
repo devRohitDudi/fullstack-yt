@@ -3,6 +3,9 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 const VideoCard = ({ video, isOwner }) => {
   console.log("video is:", video);
   const [isPopuoOpen, setIsPopupOpen] = useState(false);
@@ -12,7 +15,7 @@ const VideoCard = ({ video, isOwner }) => {
   const removeVideo = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/playlist/remove-from-playlist`,
+        `${backendAddress}/api/v1/playlist/remove-from-playlist`,
         {
           video_id: video._id,
           playlist_id: playlist_id.playlist_id,
@@ -74,7 +77,7 @@ const Playlist = () => {
     try {
       console.log("playlist_id is:", playlist_id.playlist_id);
       const response = await axios.get(
-        `http://localhost:4000/api/v1/playlist/get-playlist/${playlist_id.playlist_id}`,
+        `${backendAddress}/api/v1/playlist/get-playlist/${playlist_id.playlist_id}`,
         { withCredentials: "include" }
       );
       console.log("response:", response);

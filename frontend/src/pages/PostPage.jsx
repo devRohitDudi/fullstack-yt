@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import PostComments from "../components/PostComments.jsx";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 export default function PostPage() {
   const [post, setPost] = useState(null);
   const [postFetching, setPostFteching] = useState(false);
@@ -20,7 +23,7 @@ export default function PostPage() {
   const fetchPost = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:4000/api/v1/post/get/${post_id}`,
+        `${backendAddress}/api/v1/post/get/${post_id}`,
         { withCredentials: "include", headers: {} }
       );
       console.log("post response;", response);
@@ -43,7 +46,7 @@ export default function PostPage() {
   const handleLike = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/post/like-post`,
+        `${backendAddress}/api/v1/post/like-post`,
         { post_id: post_id },
         {
           withCredentials: "include",
@@ -76,7 +79,7 @@ export default function PostPage() {
     try {
       setCommentsFetching(true);
       const response = await axios.get(
-        `http://localhost:4000/api/v1/comment/get-post-comments/${post_id}?page=${commentsPage}&limit=10`,
+        `${backendAddress}/api/v1/comment/get-post-comments/${post_id}?page=${commentsPage}&limit=10`,
         { withCredentials: "include", headers: {} }
       );
       console.log("comments response:", response);

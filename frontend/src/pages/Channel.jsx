@@ -6,6 +6,7 @@ import useAuthStore from "../store/useAuthStore";
 import ChannelVideoCard from "../components/ChannelVideoCard";
 import ChannelPostCard from "../components/ChannelPostCard";
 import PlaylistCard from "../components/PlaylistCard";
+const backendAddress = "https://fullstack-yt.onrender.com";
 const Channel = () => {
   const { username } = useParams();
   const { isLoggedIn, currentUsername } = useAuthStore();
@@ -74,7 +75,7 @@ const Channel = () => {
     }
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/channel/subscribe/${channelId}`,
+        `${backendAddress}/api/v1/channel/subscribe/${channelId}`,
         {}, // Empty body if no data
         {
           headers: {
@@ -103,7 +104,7 @@ const Channel = () => {
       try {
         setLoading(true);
         const channelData = await axios.get(
-          `http://localhost:4000/api/v1/channel/get/${channelId}`,
+          `${backendAddress}/api/v1/channel/get/${channelId}`,
           {
             headers: {
               // Let browser set Content-Type for FormData
@@ -147,7 +148,7 @@ const Channel = () => {
       try {
         setVideosLoading(true);
         const channelVideos = await axios.get(
-          `http://localhost:4000/api/v1/channel/get-channel-videos/${channelId}?page=${videosPage}&limit=20`,
+          `${backendAddress}/api/v1/channel/get-channel-videos/${channelId}?page=${videosPage}&limit=20`,
           {
             headers: { Accept: "application/json" },
             withCredentials: "include",
@@ -236,7 +237,7 @@ const Channel = () => {
       try {
         setPlaylistsLoading(true);
         const channelPlaylists = await axios.get(
-          `http://localhost:4000/api/v1/channel/get-channel-playlists/${channelId}?page=${playlistsPage}&limit=20`,
+          `${backendAddress}/api/v1/channel/get-channel-playlists/${channelId}?page=${playlistsPage}&limit=20`,
           {
             headers: { Accept: "application/json" },
             withCredentials: "include",
@@ -316,7 +317,7 @@ const Channel = () => {
       try {
         setPostsLoading(true);
         const channelPosts = await axios.get(
-          `http://localhost:4000/api/v1/post/get-channel-posts/${channelId}?page=${postsPage}&limit=20`,
+          `${backendAddress}/api/v1/post/get-channel-posts/${channelId}?page=${postsPage}&limit=20`,
           {
             headers: { Accept: "application/json" },
             withCredentials: "include",
@@ -435,11 +436,10 @@ const Channel = () => {
             </div>
             <button
               onClick={handleSubscribe}
-              className={`px-6 py-2 rounded-full transition-colors duration-200 ${
-                isSubscribed
-                  ? "bg-zinc-800 text-white hover:bg-zinc-700"
-                  : "bg-gray-100 text-black hover:bg-gray-200"
-              }`}
+              className={`px-6 py-2 rounded-full transition-colors duration-200 ${isSubscribed
+                ? "bg-zinc-800 text-white hover:bg-zinc-700"
+                : "bg-gray-100 text-black hover:bg-gray-200"
+                }`}
             >
               {isSubscribed ? "Unsubscribe" : "Subscribe"}
             </button>
@@ -453,41 +453,37 @@ const Channel = () => {
           <div className="flex gap-8">
             <button
               onClick={() => handleTabChange("videos")}
-              className={`py-4 border-b-2 ${
-                activeTab === "videos"
-                  ? "border-white"
-                  : "border-transparent text-gray-400 hover:text-white"
-              }`}
+              className={`py-4 border-b-2 ${activeTab === "videos"
+                ? "border-white"
+                : "border-transparent text-gray-400 hover:text-white"
+                }`}
             >
               VIDEOS
             </button>
             <button
               onClick={() => handleTabChange("playlists")}
-              className={`py-4 border-b-2 ${
-                activeTab === "playlists"
-                  ? "border-white"
-                  : "border-transparent text-gray-400 hover:text-white"
-              }`}
+              className={`py-4 border-b-2 ${activeTab === "playlists"
+                ? "border-white"
+                : "border-transparent text-gray-400 hover:text-white"
+                }`}
             >
               PLAYLISTS
             </button>
             <button
               onClick={() => handleTabChange("posts")}
-              className={`py-4 border-b-2 ${
-                activeTab === "posts"
-                  ? "border-white"
-                  : "border-transparent text-gray-400 hover:text-white"
-              }`}
+              className={`py-4 border-b-2 ${activeTab === "posts"
+                ? "border-white"
+                : "border-transparent text-gray-400 hover:text-white"
+                }`}
             >
               POSTS
             </button>
             <button
               onClick={() => handleTabChange("about")}
-              className={`py-4 border-b-2 ${
-                activeTab === "about"
-                  ? "border-white"
-                  : "border-transparent text-gray-400 hover:text-white"
-              }`}
+              className={`py-4 border-b-2 ${activeTab === "about"
+                ? "border-white"
+                : "border-transparent text-gray-400 hover:text-white"
+                }`}
             >
               ABOUT
             </button>
@@ -526,7 +522,7 @@ const Channel = () => {
               </div>
             )}{" "}
             {fetchedPlaylistsCount >= playlistsCount &&
-            activeTab === "playlists" ? (
+              activeTab === "playlists" ? (
               <p className="text-white">All playlists are here</p>
             ) : null}
           </div>

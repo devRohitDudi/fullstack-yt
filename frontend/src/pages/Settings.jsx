@@ -3,6 +3,8 @@ import axios from "axios";
 import useAuthStore from "../store/useAuthStore";
 import { Link } from "react-router-dom";
 
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 const Settings = () => {
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
@@ -22,7 +24,7 @@ const Settings = () => {
   const handlePasswordChange = () => {
     axios
       .post(
-        `http://localhost:4000/api/v1/user/change-password`,
+        `${backendAddress}/api/v1/user/change-password`,
         {
           oldPassword,
           newPassword,
@@ -41,7 +43,7 @@ const Settings = () => {
 
   const handleDetailsUpdate = () => {
     axios
-      .patch(`http://localhost:4000/api/v1/user/update-details`, details, {
+      .patch(`${backendAddress}/api/v1/user/update-details`, details, {
         headers: {
           // Let browser set Content-Type for FormData
           Accept: "application/json", // Backend likely expects this
@@ -56,7 +58,7 @@ const Settings = () => {
     const formData = new FormData();
     formData.append("avatar", avatar);
     axios
-      .patch(`http://localhost:4000/api/v1/user/update-avatar`, formData, {
+      .patch(`${backendAddress}/api/v1/user/update-avatar`, formData, {
         headers: {
           // Let browser set Content-Type for FormData
           Accept: "application/json", // Backend likely expects this
@@ -71,7 +73,7 @@ const Settings = () => {
     const formData = new FormData();
     formData.append("coverImage", coverImage);
     axios
-      .patch(`http://localhost:4000/api/v1/user/update-cover-image`, formData, {
+      .patch(`${backendAddress}/api/v1/user/update-cover-image`, formData, {
         headers: {
           // Let browser set Content-Type for FormData
           Accept: "application/json", // Backend likely expects this
@@ -85,7 +87,7 @@ const Settings = () => {
   const handleLogout = async () => {
     try {
       const loggedOutUser = await fetch(
-        "http://localhost:4000/api/v1/user/logout",
+        `${backendAddress}/api/v1/user/logout`,
         {
           method: "POST",
           credentials: "include", // Send HttpOnly cookies
@@ -129,7 +131,7 @@ const Settings = () => {
       {isLoggedIn && (
         <div className="mb-6 p-4 bg-gray-800 rounded-lg">
           <p className="text-base sm:text-lg">
-            Logged in as: <span className="font-semibold">{}</span> (
+            Logged in as: <span className="font-semibold">{ }</span> (
             {currentUsername})
           </p>
         </div>

@@ -5,6 +5,8 @@ import useAuthStore from "../store/useAuthStore.js";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 function PlaylistCard({ playlist }) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { isLoggenIn } = useAuthStore();
@@ -18,8 +20,7 @@ function PlaylistCard({ playlist }) {
   const deletePlaylist = async () => {
     try {
       const response = await axios.patch(
-        `
-                    http://localhost:4000/api/v1/playlist/delete-playlist/${playlist._id}`,
+        `${backendAddress}/api/v1/playlist/delete-playlist/${playlist._id}`,
         {},
         {
           withCredentials: "include",
@@ -101,7 +102,7 @@ export default function Playlists() {
       console.log("playlist fetch invoked");
 
       const response = await axios.post(
-        "http://localhost:4000/api/v1/playlist/get-all-playlists",
+        `${backendAddress}/api/v1/playlist/get-all-playlists`,
         { currentVideo: null },
         {
           withCredentials: true,

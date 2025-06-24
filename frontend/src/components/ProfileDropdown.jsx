@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { User, LogOut, Settings, Upload } from "lucide-react";
 import useAuthStore from "../store/useAuthStore.js";
 import axios from "axios";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -26,7 +29,7 @@ const ProfileDropdown = () => {
   const handleLogout = async () => {
     try {
       const loggedOutUser = await fetch(
-        "http://localhost:4000/api/v1/user/logout",
+        `${backendAddress}/api/v1/user/logout`,
         {
           method: "POST",
           credentials: "include", // Send HttpOnly cookies

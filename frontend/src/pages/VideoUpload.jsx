@@ -3,6 +3,9 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { X, Upload, FileVideo } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 const VideoUpload = () => {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
@@ -67,7 +70,7 @@ const VideoUpload = () => {
       console.log("formData", formData);
 
       const response = await axios.post(
-        `http://localhost:4000/api/v1/video/upload`,
+        `${backendAddress}/api/v1/video/upload`,
         formData,
         {
           METHOD: "POST",
@@ -120,9 +123,8 @@ const VideoUpload = () => {
         <div className="space-y-6">
           {/* Video Upload Area */}
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center ${
-              file ? "border-blue-500" : "border-gray-600"
-            }`}
+            className={`border-2 border-dashed rounded-lg p-8 text-center ${file ? "border-blue-500" : "border-gray-600"
+              }`}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
@@ -235,11 +237,10 @@ const VideoUpload = () => {
           <button
             onClick={handleUpload}
             disabled={isUploading || !file || !title}
-            className={`w-full py-3 rounded-lg font-medium ${
-              isUploading || !file || !title
-                ? "bg-zinc-700 text-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            className={`w-full py-3 rounded-lg font-medium ${isUploading || !file || !title
+              ? "bg-zinc-700 text-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+              }`}
           >
             {isUploading ? "Uploading..." : "Upload Video"}
           </button>

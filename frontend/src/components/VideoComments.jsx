@@ -2,6 +2,9 @@ import { useState } from "react";
 import axios from "axios";
 import useAuthStore from "../store/useAuthStore";
 import Replies from "../components/Replies.jsx";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 //baby comp for rendering every comment
 const Comment = ({ comment }) => {
   const [isDeleted, setIsDeleted] = useState(false);
@@ -21,7 +24,7 @@ const Comment = ({ comment }) => {
   const deleteComment = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/comment/delete-comment/${comment._id}`,
+        `${backendAddress}/api/v1/comment/delete-comment/${comment._id}`,
         {},
         {
           withCredentials: "include",
@@ -43,7 +46,7 @@ const Comment = ({ comment }) => {
     }
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/comment/like-comment/${comment._id}`,
+        `${backendAddress}/api/v1/comment/like-comment/${comment._id}`,
         {},
         {
           withCredentials: "include",
@@ -68,7 +71,7 @@ const Comment = ({ comment }) => {
     }
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/comment/dislike-comment/${comment._id}`,
+        `${backendAddress}/api/v1/comment/dislike-comment/${comment._id}`,
         {},
         {
           withCredentials: "include",
@@ -85,7 +88,7 @@ const Comment = ({ comment }) => {
   async function handleReply() {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/comment/reply-on/${comment._id}`,
+        `${backendAddress}/api/v1/comment/reply-on/${comment._id}`,
         { message: replyText },
         {
           withCredentials: "include",
@@ -128,9 +131,8 @@ const Comment = ({ comment }) => {
           <div className="flex items-center gap-6 mt-3 text-sm text-gray-400">
             <button
               onClick={handleLike}
-              className={`${
-                isLiked ? "bg-gray-500" : null
-              }flex flex-col items-center gap-1 hover:text-white transition-colors duration-200`}
+              className={`${isLiked ? "bg-gray-500" : null
+                }flex flex-col items-center gap-1 hover:text-white transition-colors duration-200`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -148,9 +150,8 @@ const Comment = ({ comment }) => {
             </button>
             <button
               onClick={handleDislike}
-              className={` ${
-                isDisliked ? "bg-gray-500" : null
-              }flex flex-col items-center gap-1 hover:text-white transition-colors duration-200`}
+              className={` ${isDisliked ? "bg-gray-500" : null
+                }flex flex-col items-center gap-1 hover:text-white transition-colors duration-200`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -236,15 +237,19 @@ const Comment = ({ comment }) => {
 
 const VideoComments = ({ comments, commentsCount, videoId }) => {
   const [newComment, setNewComment] = useState("");
-
+  const [error, setError] = useState(null)
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
+    const removeError = setTimeout(() => {
+      setError(null)
+    }, 5000)
+
     try {
       const message = newComment;
       const response = await axios.post(
-        `http://localhost:4000/api/v1/video/add-comment/${videoId}`,
+        `${backendAddress}/api/v1/video/add-comment/${videoId}`,
         { message },
         {
           headers: { Accept: "application/json" },
@@ -260,8 +265,9 @@ const VideoComments = ({ comments, commentsCount, videoId }) => {
       }
     } catch (error) {
       console.log("error while creating comment", error);
+      setError(error.response.data.message)
+      removeError()
     }
-
     setNewComment("");
   };
 
@@ -301,6 +307,9 @@ const VideoComments = ({ comments, commentsCount, videoId }) => {
             </div>
           </div>
         </div>
+        {error &&
+          <p className="text-red-600">{error}</p>
+        }
       </form>
 
       <div className="space-y-2">

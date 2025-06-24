@@ -8,6 +8,8 @@ import { Playlist } from "../../../backend/src/models/playlist.model";
 import VideoComments from "../components/VideoComments.jsx";
 import { usePreferencesStore } from "../store/useAuthStore.js";
 
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 const Watch = () => {
   const { isLoggedIn, currentUsername } = useAuthStore();
   const [searchParams] = useSearchParams();
@@ -40,7 +42,7 @@ const Watch = () => {
   //TODO isLiked? && isDisliked?
   // for fetching video
   const { interests, setUserInterests } = usePreferencesStore();
-  const handleSetInterests = async () => {};
+  const handleSetInterests = async () => { };
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -48,7 +50,7 @@ const Watch = () => {
         setLoading(true);
 
         const videoRes = await axios.get(
-          `http://localhost:4000/api/v1/video/watch/${videoId}`,
+          `${backendAddress}/api/v1/video/get-video/${videoId}`,
           {
             withCredentials: "include",
             headers: {},
@@ -90,7 +92,7 @@ const Watch = () => {
   useEffect(() => {
     const addViewhistory = async () => {
       const addToHistoryRes = await axios.patch(
-        `http://localhost:4000/api/v1/video/add-view-history/${videoId}`,
+        `${backendAddress}/api/v1/video/add-view-history/${videoId}`,
         {},
         { withCredentials: "include" }
       );
@@ -115,7 +117,7 @@ const Watch = () => {
     try {
       setIsCommentsFetching(true);
       const response = await axios.get(
-        `http://localhost:4000/api/v1/video/comments/${videoId}?page=${commentsPage}&limit=20`,
+        `${backendAddress}/api/v1/video/comments/${videoId}?page=${commentsPage}&limit=20`,
         { withCredentials: "include", headers: {} }
       );
 
@@ -169,7 +171,7 @@ const Watch = () => {
     }
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/video/add-like/${videoId}`,
+        `${backendAddress}/api/v1/video/add-like/${videoId}`,
         {},
         {
           withCredentials: "include",
@@ -201,7 +203,7 @@ const Watch = () => {
     }
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/video/add-like/${videoId}`,
+        `${backendAddress}/api/v1/video/add-like/${videoId}`,
         {},
         {
           withCredentials: "include",
@@ -224,7 +226,7 @@ const Watch = () => {
     }
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/channel/subscribe/${channelId}`,
+        `${backendAddress}/api/v1/channel/subscribe/${channelId}`,
         {}, // Empty body if no data
         {
           headers: {
@@ -256,7 +258,7 @@ const Watch = () => {
     try {
       setPlaylistsLoading(true);
       const response = await axios.post(
-        `http://localhost:4000/api/v1/playlist/get-all-playlists`,
+        `${backendAddress}/api/v1/playlist/get-all-playlists`,
         { currentVideo: video._id },
         {
           withCredentials: "include",
@@ -280,7 +282,7 @@ const Watch = () => {
     try {
       for (const playlist of playlists) {
         const response = await axios.patch(
-          `http://localhost:4000/api/v1/playlist/update-video-status`,
+          `${backendAddress}/api/v1/playlist/update-video-status`,
           {
             video_id: video._id,
             containsVideo: playlist.containsVideo,
@@ -303,7 +305,7 @@ const Watch = () => {
   const createPlaylist = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/playlist/create-playlist`,
+        `${backendAddress}/api/v1/playlist/create-playlist`,
         { name: playlistText, visibility: newPlaylistVisibility },
         { withCredentials: "include", headers: {} }
       );
@@ -382,10 +384,9 @@ const Watch = () => {
                     handleSubscribe();
                   }}
                   className={`
-                    ${
-                      isSubscribed
-                        ? "bg-gray-800 hover:bg-gray-500"
-                        : "bg-red-600 hover:bg-red-500"
+                    ${isSubscribed
+                      ? "bg-gray-800 hover:bg-gray-500"
+                      : "bg-red-600 hover:bg-red-500"
                     }
                     px-4 py-2 text-white rounded-full transition-colors duration-200
                   `}

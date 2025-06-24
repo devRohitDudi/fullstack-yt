@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 const Button = ({ children, className = "", ...props }) => {
   return (
     <button
@@ -71,7 +74,7 @@ export default function CreatePost() {
       console.log("images:", images);
 
       const response = await axios.post(
-        `http://localhost:4000/api/v1/post/create-post`,
+        `${backendAddress}/api/v1/post/create-post`,
         formData,
         { withCredentials: "include", headers: {} }
       );

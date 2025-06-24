@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { MoreVertical } from "lucide-react";
 import axios from "axios";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 // Card Component
 export const Card = ({ children, className }) => (
   <div className={`bg-white rounded-xl shadow-md overflow-hidden ${className}`}>
@@ -28,7 +31,7 @@ const HistoryVideoCard = ({ video, history_obj_id }) => {
     try {
       console.log("history_obj_id is:", history_obj_id);
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/video/remove-watch-history/${history_obj_id}`,
+        `${backendAddress}/api/v1/video/remove-watch-history/${history_obj_id}`,
         {},
         {
           withCredentials: "include",
@@ -43,7 +46,7 @@ const HistoryVideoCard = ({ video, history_obj_id }) => {
       setError(error.message);
       alert(
         error.response?.data?.message ||
-          "Error occured while removing from watch history"
+        "Error occured while removing from watch history"
       );
     }
   };
@@ -99,7 +102,7 @@ const WatchHistoryPage = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `http://localhost:4000/api/v1/video/get-watch-history?page=${page}&limit=20`,
+        `${backendAddress}/api/v1/video/get-watch-history?page=${page}&limit=20`,
         {
           withCredentials: "include",
           headers: {},

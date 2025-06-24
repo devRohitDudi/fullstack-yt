@@ -3,6 +3,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect } from "react";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 function ChannelPostCard({ post }) {
   console.log("post is:", post);
   const [commentPopup, setCommentPopup] = useState(false);
@@ -26,7 +29,7 @@ function ChannelPostCard({ post }) {
   const handleLike = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/post/like-post`,
+        `${backendAddress}/api/v1/post/like-post`,
         { post_id: post._id },
         {
           withCredentials: "include",
@@ -53,7 +56,7 @@ function ChannelPostCard({ post }) {
   const handleComment = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:4000/api/v1/post/add-comment`,
+        `${backendAddress}/api/v1/post/add-comment`,
         { post_id: post._id, message: commentText },
         {
           withCredentials: "include",

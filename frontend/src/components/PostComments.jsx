@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore.js";
 import axios from "axios";
+
+const backendAddress = "https://fullstack-yt.onrender.com";
+
 const CommentCard = ({ comment }) => {
   const [showReplies, setShowReplies] = useState(false);
   const [replies, setReplies] = useState([]);
@@ -31,7 +34,7 @@ const CommentCard = ({ comment }) => {
     try {
       setIsRepliesFatching(true);
       const response = await axios.get(
-        `http://localhost:4000/api/v1/comment/get-replies/${comment._id}?page=${repliesPage}&limit=10`,
+        `${backendAddress}/api/v1/comment/get-replies/${comment._id}?page=${repliesPage}&limit=10`,
         { withCredentials: "include" }
       );
       console.log("resplies response:", response);
@@ -61,7 +64,7 @@ const CommentCard = ({ comment }) => {
     try {
       setIsReplyPatching(true);
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/comment/reply-on/${comment._id}`,
+        `${backendAddress}/api/v1/comment/reply-on/${comment._id}`,
         { message: replyText },
         {
           withCredentials: "include",
@@ -82,7 +85,7 @@ const CommentCard = ({ comment }) => {
   const handleLike = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/comment/like-comment/${comment._id}`,
+        `${backendAddress}/api/v1/comment/like-comment/${comment._id}`,
         {},
         {
           withCredentials: "include",
@@ -105,7 +108,7 @@ const CommentCard = ({ comment }) => {
   const deleteReply = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:4000/api/v1/comment/delete-comment/${comment._id}`,
+        `${backendAddress}/api/v1/comment/delete-comment/${comment._id}`,
         {},
         { withCredentials: "include", headers: {} }
       );
@@ -284,7 +287,7 @@ const PostComments = ({ comments }) => {
       }
 
       const response = await axios.post(
-        `http://localhost:4000/api/v1/post/add-comment`,
+        `${backendAddress}/api/v1/post/add-comment`,
         { post_id, message: commentText },
         { withCredentials: "include", headers: {} }
       );
