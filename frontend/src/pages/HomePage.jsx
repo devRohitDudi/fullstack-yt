@@ -25,6 +25,7 @@ const HomePage = ({ sidebarOpen }) => {
   const [playlistText, setPlaylistText] = useState("");
   const [newPlaylistVisibility, setNewPlaylistVisibility] = useState("private");
   const { isLoggedIn, currentUsername } = useAuthStore();
+  const [homeMessage, setHomeMessage] = useState(null);
 
   const { interests, setUserInterests } = usePreferencesStore();
   const handleSetInterests = async () => { };
@@ -59,6 +60,7 @@ const HomePage = ({ sidebarOpen }) => {
       setIsFetching(false);
     } catch (error) {
       setIsFetching(false);
+      setHomeMessage("If the videos are not loading, it’s likely our backend has spun down due to inactivity. Please refresh the page a few times to wake it up.")
       setError(error);
     }
   };
@@ -199,7 +201,12 @@ const HomePage = ({ sidebarOpen }) => {
               <div className="flex justify-center items-center ">
                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
               </div>
-            ) : null}
+            ) : null
+            }
+            {
+              homeMessage.length > 0 ? <div className="text-bold text-gray-200">{homeMessage}</div> : null
+            }
+
           </main>
         </div>
       </div>
