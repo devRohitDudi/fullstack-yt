@@ -25,7 +25,7 @@ const HomePage = ({ sidebarOpen }) => {
   const [playlistText, setPlaylistText] = useState("");
   const [newPlaylistVisibility, setNewPlaylistVisibility] = useState("private");
   const { isLoggedIn, currentUsername } = useAuthStore();
-  const [homeMessage, setHomeMessage] = useState(null);
+  const [homeMessage, setHomeMessage] = useState('');
 
   const { interests, setUserInterests } = usePreferencesStore();
   const handleSetInterests = async () => { };
@@ -204,7 +204,7 @@ const HomePage = ({ sidebarOpen }) => {
             ) : null
             }
             {
-              homeMessage.length > 0 ? <div className="text-bold text-gray-200">{homeMessage}</div> : null
+              homeMessage.length > 1 ? <div className="text-bold text-gray-200">{homeMessage}</div> : null
             }
 
           </main>
