@@ -4,7 +4,6 @@ import axios, { isCancel } from "axios";
 import { Link } from "react-router-dom";
 import VideoSuggestions from "../components/VideoSuggestions";
 import useAuthStore from "../store/useAuthStore";
-import { Playlist } from "../../../backend/src/models/playlist.model";
 import VideoComments from "../components/VideoComments.jsx";
 import { usePreferencesStore } from "../store/useAuthStore.js";
 
